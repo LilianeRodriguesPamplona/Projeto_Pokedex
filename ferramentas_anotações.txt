@@ -1,0 +1,135 @@
+Introdução ao Desenvolvimento Web com JavaScript
+
+1 etapa
+
+node -v
+npm -v já vem instalado
+npm install -g http-server // ferramenta instalar
+// Depois dá um http-server na linha de comando e prontinho.
+
+http-server ./ // Nesta pasta abrir pasta através do http-server, estou subindo o servidor.
+
+Ambiente configurado!
+node configurado ok
+npm configurado ok
+http-server funcionando e já rodando na pasta servindo como um servidor para que eu possa acessar no browser.
+
+
+2 etapa
+
+protocolo cliente servidor - implementaççao protocolo http
+
+Para que serve o Protocolo HTTP - é um protocolo de comunicação cliente servidor que nos permite a obtenção de recursos de forma padronizada e organizada.
+
+Adicionar o normalize CSS nos projetos para zerar o formato. Link https://cdnjs.com/libraries/normalize  para utilizar nos projetos!
+
+OBS: quando estiver desenvolvendo acesse inspecionar código e vá em network e ativa o disable cache, o cache do navegador continua sendo um problema ao editar sites, pois armazena uma versão mais antiga da página. Para ter uma melhor experiência de edição, você pode desabilitar o cache em seu navegador. Utilizar apenas quando estiver codificando e depois desativar. Lembre-se de que esse "Desativar cache" afetará todas as páginas da Web em que você navegar. Portanto, convém desativá-lo (desmarque a caixa) quando terminar de editar.
+
+
+Adicionando a fonte Roboto no projeto https://fonts.google.com/specimen/Roboto?query=roboto
+
+Uma boa prática é aplicar no CSS a técnica mobile. O conceito de mobile first se refere à criação de qualquer projeto web que prioriza a experiência em dispositivos móveis, enquanto são feitas adaptações para o desktop e outras plataformas.
+
+https://github.com/digitalinnovationone/js-developer-pokedex
+
+
+Dominando o Protocolo HTTP e Integrando com a PokeAPI
+Entendendo o funcionamento do protocolo HTTP
+Como funcionam as requisições
+
+* URL Path e Method
+
+Requisição HTTP
+URL: https://pokeapi.co/api/v2/pokemon
+${Endereço}/${path = caminho de identificação do recurso}
+IP: https://pokeapi.co
+    https:/127.0.0.1:3000
+
+path = caminho de identificação do recurso
+/api/v2/pokemon
+
+Primera área de transferencia de dados é o próprio path que já é um meio de transferir dados, exemplo:
+https://pokeapi.co/api/v2/pokemon/1  <- {Id} através do id.
+
+Request Method: GET | POS | PUT | DELETE | PATCH etc..
+
+Toda requisição para um recurso o método diz o que a gente quer fazer sobre esse recurso! Principalmente nas api's que hoje seguem os padrões de projetos rest.
+
+* Path Params e Query String
+A  segunda área de transferencia de dados é Query String que é uma descrição de busca.
+Sintaxe:
+https://pokeapi.co/api/v2/pokemon?type=grass&name=i tudo que vem depois da ? é uma query string, que é uma estrutura de chave e valor. Caso eu quera adicionar mais de um argumento eu posso fazer através do & que é concatenar.
+type = grass  chave e valor!
+name = i
+
+https://pokeapi.co/api/v2/pokemon?offset=4&lmt=2 funciona como uma paginação entre as buscas dos dados.
+offset = 20
+limit = 20
+
+
+* Headers
+São áreas que podemos transmitir dados para o servidor como também receber dados do servidor. Os Headers normalmente sao metadados da nossa requisiçao, sao coisas para descrever a nossa requisiçao ou complementar a nossa requisiçao. Os Headers sao uma especie de configuracao da nossa requisiçao.
+Temos:
+Request Headers - configuracao da nossa api
+
+Response Headers - configuracao da nossa api
+exemplo:
+accept-language:
+pt-BR;q=1
+pt;q=0.9
+en-US;q=0.8
+en;q=0.7
+gl;q=0.6
+
+Outro exemplo de Headers é a autenticacao, as credencias de autenticacao são passadas no Header dentro de um tipo de Header que é o Authorization dentre outros como basic, bearer etc.
+
+
+* Body e Status Code
+Body o corpo da nossa requisiçao que é o dado que eu quero trafegar na requisiçao dependendo do tipo da requisiçao eu envio um corpo mais robusto de informação.
+exemplo:
+Request Header
+content-type: aplication/json
+
+Body
+{
+    "name": "Teste";
+}
+
+O Body faz mais sentido utilizar enviar no POST/PUT/PATCH etc..!
+
+Resumindo uma requisiçao ela é composta de uma URL, REQUEST METHOD, REQUEST HEADERS, REQUEST BODY.
+
+Uma reposta do servidor ele vai ter um
+* STATUS CODE
+Status code - a situação da nossa requisiçao, se ela foi processada ou não etc.. ele retorna um número de status da solicitação atendida ou não.
+
+Status code: 200 ok
+vai ter o
+- Response Headers
+- Response Body
+
+OBS: a familia status 200-299 quer dizer sucesso!
+
+
+
+* integração da pokedex - integrando com a pokeapi
+
+como que a gente faz uma requisição http via JavaScript, existem várias formas mas utilizaremos o fetch api que é uma biblioteca que já tá integrada no JavaScript do browser por isso não precisamos instalar nada pra que ele funcione nos browsers mais modernos.
+
+importate!
+Por padrão o fetch sempre retorna como resposta uma string de dados. No console > response > body:{...} ele aparece como ReadableStream para trabalharmos com essa string que contém um json dentro então teremos que converter o body que está em ReadableStream para um json pra gente poder acessar e manipular como se fosse um objeto JavaScript. Segue o exemplo abaixo:
+
+const offset = 0;
+const limit = 10;
+const url = `https://pokeapi.co/api/v2/pokemon?offset=${offset}&limit=${limit}`
+
+// Promise resposta assíncrona / função callback Estudar o conceito!
+// Primeiro consumo de uma requisição através do fetch com processamento assíncrona.
+// Tudo isso já é uma estrutura de interface de uma promise (de certa forma a interface de uma promise foi baseada no bloco try catch e finally). É muito parecido com o que a gente vê dentro de uma estrutura de tratamento de erro utilizando o mesmo principio com o try, catch e finally.
+fetch(url)
+    .then((response) => response.json())  // => significa arrow function, sintaxe reduzida de definição de uma função.. function! // Retorna uma promisse any
+    .then((jsonBody) => console.log(jsonBody)) // Retorna uma promise de any, o resultado desse primeiro then vai ser encadeado para o segundo e por aí vai..
+    .catch((error) => console.error(error))  //caso ocorra algum erro utilizaremos o cath
+    /* .finally(function () { // utilizamos o finally independente do sucesso ou do fracasso da resposta para dar como concluída a requisição.
+        console.log('Requisição concluída!')
+    })*/
